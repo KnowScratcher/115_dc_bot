@@ -5,7 +5,7 @@ import re
 from typing import Dict, List, Any
 
 class DatabaseManager:
-    def __init__(self, guild_id: int, guild_name: str = None):
+    def __init__(self, guild_id: int, guild_name: str | None = None):
         self.guild_id = guild_id
         
         # 處理伺服器名稱，移除不適合作為檔案名的字元
@@ -51,7 +51,7 @@ class DatabaseManager:
             ''')
             await db.commit()
 
-    async def save_verification_role(self, user_id: str, role_id: int, role_name: str = None):
+    async def save_verification_role(self, user_id: str, role_id: int, role_name: str | None = None):
         """儲存驗證角色資訊"""
         try:
             with open(self.verification_json, 'r', encoding='utf-8') as f:
@@ -85,7 +85,7 @@ class DatabaseManager:
             
         return True
     
-    async def get_role_id(self, role_name: str) -> int:
+    async def get_role_id(self, role_name: str) -> int | None:
         """取得角色 ID"""
         try:
             with open(self.verification_json, 'r', encoding='utf-8') as f:
@@ -94,7 +94,7 @@ class DatabaseManager:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
         
-    async def get_role_id_config(self, role_name: str) -> int:
+    async def get_role_id_config(self, role_name: str) -> int | None:
         """取得角色 ID"""
         try:
             with open(self.config_json, 'r', encoding='utf-8') as f:
@@ -103,7 +103,7 @@ class DatabaseManager:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
         
-    async def get_channel_id(self, channel_name: str) -> int:
+    async def get_channel_id(self, channel_name: str) -> int | None:
         """取得頻道 ID"""
         try:
             with open(self.config_json, 'r', encoding='utf-8') as f:
@@ -112,7 +112,7 @@ class DatabaseManager:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
         
-    async def get_mcserver_message(self) -> int:
+    async def get_mcserver_message(self) -> int | None:
         """取得麥塊伺服器控制面板的訊息"""
         try:
             with open(self.config_json, 'r', encoding='utf-8') as f:
@@ -121,7 +121,7 @@ class DatabaseManager:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
     
-    async def get_verification_role(self, user_id: str) -> int:
+    async def get_verification_role(self, user_id: str) -> int | None:
         """取得使用者的驗證角色"""
         try:
             with open(self.verification_json, 'r', encoding='utf-8') as f:
@@ -173,7 +173,7 @@ class DatabaseManager:
             )
             await db.commit()
 
-    async def get_application_channel(self, user_id: int) -> Dict:
+    async def get_application_channel(self, user_id: int) -> Dict | None:
         """取得使用者的申請頻道資訊"""
         async with aiosqlite.connect(self.db_name) as db:
             async with db.execute(
@@ -200,7 +200,7 @@ class DatabaseManager:
             
         return True
 
-    async def get_application_category(self) -> int:
+    async def get_application_category(self) -> int | None:
         """取得申請分類頻道 ID"""
         try:
             with open(self.config_json, 'r', encoding='utf-8') as f:
@@ -291,7 +291,7 @@ class DatabaseManager:
             
         return True
 
-    async def get_emoji(self, emoji_name: str) -> Dict:
+    async def get_emoji(self, emoji_name: str) -> Dict | None:
         """取得指定的表情符號"""
         try:
             with open(self.emoji_json, 'r', encoding='utf-8') as f:
