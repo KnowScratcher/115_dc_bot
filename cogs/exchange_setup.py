@@ -7,7 +7,7 @@ from bot import is_admin
 class Exchange_Setup(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.emoji = self.bot.emoji
+        self.emoji = self.bot.emoji # type: ignore
     
     @app_commands.command(name="exchange_setup", description="建立交換備審申請面板")
     @is_admin()

@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord.ui import Button, View, Modal, TextInput, Select
 from database.db_manager import DatabaseManager
@@ -185,8 +187,17 @@ class RoleSelectionView(View):
         super().__init__(timeout=None)
         self.user_id = user_id
         self.bot = bot
-        self.emoji = bot.emoji
-        
+        self.emoji = bot.emoji # type: ignore
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(self.emoji)
+        cancel = Button(
+            label="取消", 
+            style=discord.ButtonStyle.danger,
+            emoji=self.emoji.get('x'),
+            custom_id="cancel_apply_role"
+        )
+        cancel.callback = self.cancel_callback
+
         select = Select(
             placeholder="請選擇您的身份",
             options=[
@@ -207,8 +218,26 @@ class RoleSelectionView(View):
         )
         
         select.callback = self.select_callback
+        self.add_item(cancel)
         self.add_item(select)
-    
+        
+    async def cancel_callback(self, interaction: discord.Interaction):
+        db_manager = DatabaseManager(interaction.guild.id, interaction.guild.name)
+        #TODO: await db_manager.delete_application_channel(interaction.user.id)
+        
+        embed = discord.Embed(
+            title="已取消申請",
+            description="您的身份組申請已取消，申請頻道將在5秒後被刪除。",
+            color=discord.Color.red()
+        )
+        await interaction.response.send_message(embed=embed)
+        await asyncio.sleep(5)  # 等待一秒確保訊息送出
+        channel_data = await db_manager.get_application_channel(interaction.user.id)
+        if channel_data:
+            channel = interaction.guild.get_channel(channel_data["channel_id"])
+            if channel:
+                await channel.delete()
+
     async def select_callback(self, interaction: discord.Interaction):
         custom_id = interaction.data.get("custom_id", "")
         if self.user_id == 0 and custom_id.startswith("role_select_"):
